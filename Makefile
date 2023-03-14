@@ -1,10 +1,6 @@
-all:	Hello,World
+all: geometry
 
-Hello,World:	Hello,World.c
-	gcc -o -Wall -Werror Hello,World Hello,World.c
-
-clean:
-	rm Hello,World
-
+geometry: geometry.c
+	gcc -Wall geometry.c -o geometry -lm
 run:
-	./Hello,World
+	./geometry test.txt
