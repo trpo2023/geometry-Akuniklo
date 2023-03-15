@@ -26,7 +26,7 @@ int Check_Error(char *str)
             for (int i = 0; i < strchr(str, '(') - &str[0] + 1; i++)
                 printf(" ");
             printf("^\n");
-            printf("Error at column %ld: expected \'double\'\n\n",
+            printf("Error at column %ld: expected type \'double\'\n\n",
                    strchr(str, '(') - &str[0] + 1);
             return 0;
         }
@@ -36,7 +36,7 @@ int Check_Error(char *str)
             for (int i = 0; i < (strchr(str, ' ') - &str[0] + 1); i++)
                 printf(" ");
             printf("^\n");
-            printf("Error at column %ld: expected \'double\'\n\n",
+            printf("Error at column %ld: expected type \'double\'\n\n",
                    strchr(str, ' ') - &str[0] + 1);
             return 0;
         }
@@ -46,7 +46,7 @@ int Check_Error(char *str)
             for (int i = 0; i < (strchr(str, ',') - &str[0] + 2); i++)
                 printf(" ");
             printf("^\n");
-            printf("Error at column %ld: expected \'double\'\n\n",
+            printf("Error at column %ld: expected type \'double\'\n\n",
                    strchr(str, ',') - &str[0] + 1);
             return 0;
         }
@@ -57,7 +57,7 @@ int Check_Error(char *str)
                 printf(" ");
             printf("^\n");
             printf("Error at column %ld: radius cant be \'0\' or "
-                   "negative "
+                   "less than 0 "
                    "value\n\n",
                    strchr(str, ',') - &str[0] + 2);
             return 0;
