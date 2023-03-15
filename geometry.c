@@ -16,7 +16,7 @@ struct circle
     double r;
 };
 
-int Check_Error(char *str)
+int Errors(char *str)
 {
     if (!(strncmp("circle", str, 6)))
     {
@@ -90,7 +90,7 @@ int main(int argc, char **argv)
 
     while (fgets(str, 100, data) != NULL)
     {
-        Numbers = Check_Error(str);
+        Numbers = Errors(str);
         if (!Numbers)
             continue;
         if (Numbers)
