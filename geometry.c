@@ -84,7 +84,7 @@ int main(int argc, char **argv)
     FILE *data = argc > 1 ? fopen(argv[1], "r") : NULL;
     if (data == NULL)
     {
-        printf("Error: incorrect file path, use ./app [FILE]\n");
+        printf("Error: incorrect file path, use ./geometry [FILENAME.txt]\n");
         return 1;
     }
 
@@ -112,9 +112,9 @@ int main(int argc, char **argv)
                circle[i].r);
         P = 2 * M_PI * circle[i].r;
         S = M_PI * circle[i].r * circle[i].r;
-        printf("\tperimetr = %f\n", P);
-        printf("\tarea = %f\n", S);
-        printf("\tintersects: \n");
+        printf("\tPerimetr = %f\n", P);
+        printf("\tArea = %f\n", S);
+        printf("\tIntersects: \n");
         for (int j = 0; j < nCircle; j++)
         {
             if (i == j)
