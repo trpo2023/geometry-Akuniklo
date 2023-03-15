@@ -77,7 +77,7 @@ int main(int argc, char **argv)
 {
     struct circle *circle;
     int nCircle = 0;
-    int code;
+    int Numbers;
     float SR, D;
     double P, S;
     char str[100];
@@ -90,10 +90,10 @@ int main(int argc, char **argv)
 
     while (fgets(str, 100, data) != NULL)
     {
-        code = Check_Error(str);
-        if (!code)
+        Numbers = Check_Error(str);
+        if (!Numbers)
             continue;
-        if (code)
+        if (Numbers)
         {
             nCircle++;
             circle = realloc(circle, nCircle * (sizeof(struct circle)));
