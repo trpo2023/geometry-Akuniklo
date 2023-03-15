@@ -16,7 +16,7 @@ struct circle
     double r;
 };
 
-int Errors(char *str)
+int Errors(char *str) // checking for errors
 {
     if (!(strncmp("circle", str, 6)))
     {
@@ -81,14 +81,14 @@ int main(int argc, char **argv)
     float SR, D;
     double P, S;
     char str[100];
-    FILE *data = argc > 1 ? fopen(argv[1], "r") : NULL;
+    FILE *data = argc > 1 ? fopen(argv[1], "r") : NULL; // file's name is in argv[] in funciton
     if (data == NULL)
     {
         printf("Error: incorrect file path, use ./geometry [FILENAME.txt]\n");
         return 1;
     }
 
-    while (fgets(str, 100, data) != NULL)
+    while (fgets(str, 100, data) != NULL) // circle as an array
     {
         Numbers = Errors(str);
         if (!Numbers)
