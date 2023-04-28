@@ -1,7 +1,8 @@
-*.o
-*.c'
-*.obj
+main
 geometry
-geometry.exe
-.vscode
-build
+*#Makefile#
+*Makefile~
+*.exe
+*.d
+*.a
+*.o
