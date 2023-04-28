@@ -1,5 +1,0 @@
-circle(-1 -2, 1.5)
-circle(2 0, 3)
-circle(1 2, 3)
-circle(2 3, 0)
-circl(1 1, 1)
