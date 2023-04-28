@@ -1,4 +1,7 @@
 *.o
+*.c'
+*.obj
 geometry
+geometry.exe
 .vscode
-Hello,World
+build
