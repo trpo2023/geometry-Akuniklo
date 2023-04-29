@@ -25,7 +25,7 @@ int main()
     FILE *file1;
     FILE *file;
 
-    file1 = fopen("../res/geometry.txt", "r");
+    file1 = fopen("geometry.txt", "r");
 
     if (!file1)
     {
