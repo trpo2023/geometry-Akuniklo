@@ -40,61 +40,17 @@ int main()
         file = fopen("geometry.txt", "r");
         while (fgets(a, length + 1, file))
         {
-
                 int open_index = check_circle_word(a, b, &error);
-
-                printf("%s", a);
-
-                check_word(a, b, &error, &ind_open_bracket);
-
-                printf("%s", a);
-
-                check_word(a, b, &error, &ind_open_bracket);
 
                 int close_index = search_close_index(a, &length);
 
                 int first_index = check_first_number(a, &open_index, &error);
 
-                find_close_bracket(a, &length, &ind_close_bracket);
-
-                find_close_bracket(a, &length, &ind_close_bracket);
-
                 int second_index = check_second_number(a, &first_index, &error);
-
-                check_first_num(a, &ind_open_bracket, &ind_first_num_elm, &error);
-
-                check_first_num(a, &ind_open_bracket, &ind_first_num_elm, &error);
 
                 int third_index = check_third_number(a, &second_index, &close_index, &error);
 
-                check_second_num(a, &ind_first_num_elm, &ind_second_num_elm, &error);
-
-                check_second_num(a, &ind_first_num_elm, &ind_second_num_elm, &error);
-
                 close_index = get_close_index(a, &third_index, &length, &error);
-
-                check_third_num(
-                    a,
-                    &ind_second_num_elm,
-                    &ind_last_num_elm,
-                    &error,
-                    &ind_close_bracket);
-
-                check_close_bracket(
-                    a, &ind_last_num_elm, &length, &ind_close_bracket, &error);
-
-                check_unexpected_token(a, &ind_close_bracket, &length, &error);
-                check_third_num(
-                    a,
-                    &ind_second_num_elm,
-                    &ind_last_num_elm,
-                    &error,
-                    &ind_close_bracket);
-
-                check_close_bracket(
-                    a, &ind_last_num_elm, &length, &ind_close_bracket, &error);
-
-                check_unexpected_token(a, &ind_close_bracket, &length, &error);
 
                 error = check_unexpected_tokens(a, &close_index, &length, &error);
                 if (error == 0)
