@@ -50,8 +50,7 @@ extern "C"
 #define CTEST_IMPL_DIAG_PUSH_IGNORED(w)    \
     CTEST_IMPL_PRAGMA(GCC diagnostic push) \
     CTEST_IMPL_PRAGMA(GCC diagnostic ignored "-W" #w)
-#define CTEST_IMPL_DIAG_POP() \
-    CTEST_IMPL_PRAGMA(GCC diagnostic pop)
+#define CTEST_IMPL_DIAG_POP() CTEST_IMPL_PRAGMA(GCC diagnostic pop)
 #else
 /* the push/pop functionality wasn't in gcc until 4.6, fallback to "ignored"  */
 #define CTEST_IMPL_DIAG_PUSH_IGNORED(w) \
@@ -83,17 +82,21 @@ extern "C"
 #define CTEST_IMPL_FNAME(sname, tname) CTEST_IMPL_NAME(sname##_##tname##_run)
 #define CTEST_IMPL_TNAME(sname, tname) CTEST_IMPL_NAME(sname##_##tname)
 #define CTEST_IMPL_DATA_SNAME(sname) CTEST_IMPL_NAME(sname##_data)
-#define CTEST_IMPL_DATA_TNAME(sname, tname) CTEST_IMPL_NAME(sname##_##tname##_data)
+#define CTEST_IMPL_DATA_TNAME(sname, tname) \
+    CTEST_IMPL_NAME(sname##_##tname##_data)
 #define CTEST_IMPL_SETUP_FNAME(sname) CTEST_IMPL_NAME(sname##_setup)
 #define CTEST_IMPL_SETUP_FPNAME(sname) CTEST_IMPL_NAME(sname##_setup_ptr)
-#define CTEST_IMPL_SETUP_TPNAME(sname, tname) CTEST_IMPL_NAME(sname##_##tname##_setup_ptr)
+#define CTEST_IMPL_SETUP_TPNAME(sname, tname) \
+    CTEST_IMPL_NAME(sname##_##tname##_setup_ptr)
 #define CTEST_IMPL_TEARDOWN_FNAME(sname) CTEST_IMPL_NAME(sname##_teardown)
 #define CTEST_IMPL_TEARDOWN_FPNAME(sname) CTEST_IMPL_NAME(sname##_teardown_ptr)
-#define CTEST_IMPL_TEARDOWN_TPNAME(sname, tname) CTEST_IMPL_NAME(sname##_##tname##_teardown_ptr)
+#define CTEST_IMPL_TEARDOWN_TPNAME(sname, tname) \
+    CTEST_IMPL_NAME(sname##_##tname##_teardown_ptr)
 
 #define CTEST_IMPL_MAGIC (0xdeadbeef)
 #ifdef __APPLE__
-#define CTEST_IMPL_SECTION __attribute__((used, section("__DATA, .ctest"), aligned(1)))
+#define CTEST_IMPL_SECTION \
+    __attribute__((used, section("__DATA, .ctest"), aligned(1)))
 #else
 #define CTEST_IMPL_SECTION __attribute__((used, section(".ctest"), aligned(1)))
 #endif
@@ -112,13 +115,15 @@ extern "C"
 
 #ifdef __cplusplus
 
-#define CTEST_SETUP(sname) \
-    template <>            \
-    void CTEST_IMPL_SETUP_FNAME(sname)(struct CTEST_IMPL_DATA_SNAME(sname) * data)
+#define CTEST_SETUP(sname)              \
+    template <>                         \
+    void CTEST_IMPL_SETUP_FNAME(sname)( \
+        struct CTEST_IMPL_DATA_SNAME(sname) * data)
 
-#define CTEST_TEARDOWN(sname) \
-    template <>               \
-    void CTEST_IMPL_TEARDOWN_FNAME(sname)(struct CTEST_IMPL_DATA_SNAME(sname) * data)
+#define CTEST_TEARDOWN(sname)              \
+    template <>                            \
+    void CTEST_IMPL_TEARDOWN_FNAME(sname)( \
+        struct CTEST_IMPL_DATA_SNAME(sname) * data)
 
 #define CTEST_DATA(sname)                           \
     template <typename T>                           \
@@ -136,30 +141,49 @@ extern "C"
     CTEST_IMPL_STRUCT(sname, tname, tskip, NULL, NULL, NULL); \
     static void CTEST_IMPL_FNAME(sname, tname)(void)
 
-#define CTEST_IMPL_CTEST2(sname, tname, tskip)                                                                                                                               \
-    static struct CTEST_IMPL_DATA_SNAME(sname) CTEST_IMPL_DATA_TNAME(sname, tname);                                                                                          \
-    static void CTEST_IMPL_FNAME(sname, tname)(struct CTEST_IMPL_DATA_SNAME(sname) * data);                                                                                  \
-    static void (*CTEST_IMPL_SETUP_TPNAME(sname, tname))(struct CTEST_IMPL_DATA_SNAME(sname) *) = &CTEST_IMPL_SETUP_FNAME(sname)<struct CTEST_IMPL_DATA_SNAME(sname)>;       \
-    static void (*CTEST_IMPL_TEARDOWN_TPNAME(sname, tname))(struct CTEST_IMPL_DATA_SNAME(sname) *) = &CTEST_IMPL_TEARDOWN_FNAME(sname)<struct CTEST_IMPL_DATA_SNAME(sname)>; \
-    CTEST_IMPL_STRUCT(sname, tname, tskip, &CTEST_IMPL_DATA_TNAME(sname, tname), &CTEST_IMPL_SETUP_TPNAME(sname, tname), &CTEST_IMPL_TEARDOWN_TPNAME(sname, tname));         \
-    static void CTEST_IMPL_FNAME(sname, tname)(struct CTEST_IMPL_DATA_SNAME(sname) * data)
+#define CTEST_IMPL_CTEST2(sname, tname, tskip)                                                                           \
+    static struct CTEST_IMPL_DATA_SNAME(sname)                                                                           \
+        CTEST_IMPL_DATA_TNAME(sname, tname);                                                                             \
+    static void CTEST_IMPL_FNAME(sname, tname)(                                                                          \
+        struct CTEST_IMPL_DATA_SNAME(sname) * data);                                                                     \
+    static void (*CTEST_IMPL_SETUP_TPNAME(sname, tname))(                                                                \
+        struct CTEST_IMPL_DATA_SNAME(sname) *) = &CTEST_IMPL_SETUP_FNAME(sname)<struct CTEST_IMPL_DATA_SNAME(sname)>;    \
+    static void (*CTEST_IMPL_TEARDOWN_TPNAME(sname, tname))(                                                             \
+        struct CTEST_IMPL_DATA_SNAME(sname) *) = &CTEST_IMPL_TEARDOWN_FNAME(sname)<struct CTEST_IMPL_DATA_SNAME(sname)>; \
+    CTEST_IMPL_STRUCT(                                                                                                   \
+        sname,                                                                                                           \
+        tname,                                                                                                           \
+        tskip,                                                                                                           \
+        &CTEST_IMPL_DATA_TNAME(sname, tname),                                                                            \
+        &CTEST_IMPL_SETUP_TPNAME(sname, tname),                                                                          \
+        &CTEST_IMPL_TEARDOWN_TPNAME(sname, tname));                                                                      \
+    static void CTEST_IMPL_FNAME(sname, tname)(                                                                          \
+        struct CTEST_IMPL_DATA_SNAME(sname) * data)
 
 #else
 
-#define CTEST_SETUP(sname)                                                                                                 \
-    static void CTEST_IMPL_SETUP_FNAME(sname)(struct CTEST_IMPL_DATA_SNAME(sname) * data);                                 \
-    static void (*CTEST_IMPL_SETUP_FPNAME(sname))(struct CTEST_IMPL_DATA_SNAME(sname) *) = &CTEST_IMPL_SETUP_FNAME(sname); \
-    static void CTEST_IMPL_SETUP_FNAME(sname)(struct CTEST_IMPL_DATA_SNAME(sname) * data)
+#define CTEST_SETUP(sname)                                                       \
+    static void CTEST_IMPL_SETUP_FNAME(sname)(                                   \
+        struct CTEST_IMPL_DATA_SNAME(sname) * data);                             \
+    static void (*CTEST_IMPL_SETUP_FPNAME(sname))(                               \
+        struct CTEST_IMPL_DATA_SNAME(sname) *) = &CTEST_IMPL_SETUP_FNAME(sname); \
+    static void CTEST_IMPL_SETUP_FNAME(sname)(                                   \
+        struct CTEST_IMPL_DATA_SNAME(sname) * data)
 
-#define CTEST_TEARDOWN(sname)                                                                                                    \
-    static void CTEST_IMPL_TEARDOWN_FNAME(sname)(struct CTEST_IMPL_DATA_SNAME(sname) * data);                                    \
-    static void (*CTEST_IMPL_TEARDOWN_FPNAME(sname))(struct CTEST_IMPL_DATA_SNAME(sname) *) = &CTEST_IMPL_TEARDOWN_FNAME(sname); \
-    static void CTEST_IMPL_TEARDOWN_FNAME(sname)(struct CTEST_IMPL_DATA_SNAME(sname) * data)
+#define CTEST_TEARDOWN(sname)                                                       \
+    static void CTEST_IMPL_TEARDOWN_FNAME(sname)(                                   \
+        struct CTEST_IMPL_DATA_SNAME(sname) * data);                                \
+    static void (*CTEST_IMPL_TEARDOWN_FPNAME(sname))(                               \
+        struct CTEST_IMPL_DATA_SNAME(sname) *) = &CTEST_IMPL_TEARDOWN_FNAME(sname); \
+    static void CTEST_IMPL_TEARDOWN_FNAME(sname)(                                   \
+        struct CTEST_IMPL_DATA_SNAME(sname) * data)
 
-#define CTEST_DATA(sname)                                                                    \
-    struct CTEST_IMPL_DATA_SNAME(sname);                                                     \
-    static void (*CTEST_IMPL_SETUP_FPNAME(sname))(struct CTEST_IMPL_DATA_SNAME(sname) *);    \
-    static void (*CTEST_IMPL_TEARDOWN_FPNAME(sname))(struct CTEST_IMPL_DATA_SNAME(sname) *); \
+#define CTEST_DATA(sname)                             \
+    struct CTEST_IMPL_DATA_SNAME(sname);              \
+    static void (*CTEST_IMPL_SETUP_FPNAME(sname))(    \
+        struct CTEST_IMPL_DATA_SNAME(sname) *);       \
+    static void (*CTEST_IMPL_TEARDOWN_FPNAME(sname))( \
+        struct CTEST_IMPL_DATA_SNAME(sname) *);       \
     struct CTEST_IMPL_DATA_SNAME(sname)
 
 #define CTEST_IMPL_CTEST(sname, tname, tskip)                 \
@@ -167,16 +191,26 @@ extern "C"
     CTEST_IMPL_STRUCT(sname, tname, tskip, NULL, NULL, NULL); \
     static void CTEST_IMPL_FNAME(sname, tname)(void)
 
-#define CTEST_IMPL_CTEST2(sname, tname, tskip)                                                                                                         \
-    static struct CTEST_IMPL_DATA_SNAME(sname) CTEST_IMPL_DATA_TNAME(sname, tname);                                                                    \
-    static void CTEST_IMPL_FNAME(sname, tname)(struct CTEST_IMPL_DATA_SNAME(sname) * data);                                                            \
-    CTEST_IMPL_STRUCT(sname, tname, tskip, &CTEST_IMPL_DATA_TNAME(sname, tname), &CTEST_IMPL_SETUP_FPNAME(sname), &CTEST_IMPL_TEARDOWN_FPNAME(sname)); \
-    static void CTEST_IMPL_FNAME(sname, tname)(struct CTEST_IMPL_DATA_SNAME(sname) * data)
+#define CTEST_IMPL_CTEST2(sname, tname, tskip)       \
+    static struct CTEST_IMPL_DATA_SNAME(sname)       \
+        CTEST_IMPL_DATA_TNAME(sname, tname);         \
+    static void CTEST_IMPL_FNAME(sname, tname)(      \
+        struct CTEST_IMPL_DATA_SNAME(sname) * data); \
+    CTEST_IMPL_STRUCT(                               \
+        sname,                                       \
+        tname,                                       \
+        tskip,                                       \
+        &CTEST_IMPL_DATA_TNAME(sname, tname),        \
+        &CTEST_IMPL_SETUP_FPNAME(sname),             \
+        &CTEST_IMPL_TEARDOWN_FPNAME(sname));         \
+    static void CTEST_IMPL_FNAME(sname, tname)(      \
+        struct CTEST_IMPL_DATA_SNAME(sname) * data)
 
 #endif
 
     void CTEST_LOG(const char *fmt, ...) CTEST_IMPL_FORMAT_PRINTF(1, 2);
-    void CTEST_ERR(const char *fmt, ...) CTEST_IMPL_FORMAT_PRINTF(1, 2); // doesn't return
+    void CTEST_ERR(const char *fmt, ...)
+        CTEST_IMPL_FORMAT_PRINTF(1, 2); // doesn't return
 
 #define CTEST(sname, tname) CTEST_IMPL_CTEST(sname, tname, 0)
 #define CTEST_SKIP(sname, tname) CTEST_IMPL_CTEST(sname, tname, 1)
@@ -184,42 +218,82 @@ extern "C"
 #define CTEST2(sname, tname) CTEST_IMPL_CTEST2(sname, tname, 0)
 #define CTEST2_SKIP(sname, tname) CTEST_IMPL_CTEST2(sname, tname, 1)
 
-    void assert_str(const char *cmp, const char *exp, const char *real, const char *caller, int line);
+    void assert_str(
+        const char *cmp,
+        const char *exp,
+        const char *real,
+        const char *caller,
+        int line);
 #define ASSERT_STR(exp, real) assert_str("==", exp, real, __FILE__, __LINE__)
-#define ASSERT_NOT_STR(exp, real) assert_str("!=", exp, real, __FILE__, __LINE__)
-#define ASSERT_STRSTR(str, substr) assert_str("=~", str, substr, __FILE__, __LINE__)
-#define ASSERT_NOT_STRSTR(str, substr) assert_str("!~", str, substr, __FILE__, __LINE__)
+#define ASSERT_NOT_STR(exp, real) \
+    assert_str("!=", exp, real, __FILE__, __LINE__)
+#define ASSERT_STRSTR(str, substr) \
+    assert_str("=~", str, substr, __FILE__, __LINE__)
+#define ASSERT_NOT_STRSTR(str, substr) \
+    assert_str("!~", str, substr, __FILE__, __LINE__)
 
-    void assert_wstr(const char *cmp, const wchar_t *exp, const wchar_t *real, const char *caller, int line);
+    void assert_wstr(
+        const char *cmp,
+        const wchar_t *exp,
+        const wchar_t *real,
+        const char *caller,
+        int line);
 #define ASSERT_WSTR(exp, real) assert_wstr("==", exp, real, __FILE__, __LINE__)
-#define ASSERT_NOT_WSTR(exp, real) assert_wstr("!=", exp, real, __FILE__, __LINE__)
-#define ASSERT_WSTRSTR(str, substr) assert_wstr("=~", str, substr, __FILE__, __LINE__)
-#define ASSERT_NOT_WSTRSTR(str, substr) assert_wstr("!~", str, substr, __FILE__, __LINE__)
+#define ASSERT_NOT_WSTR(exp, real) \
+    assert_wstr("!=", exp, real, __FILE__, __LINE__)
+#define ASSERT_WSTRSTR(str, substr) \
+    assert_wstr("=~", str, substr, __FILE__, __LINE__)
+#define ASSERT_NOT_WSTRSTR(str, substr) \
+    assert_wstr("!~", str, substr, __FILE__, __LINE__)
 
-    void assert_data(const unsigned char *exp, size_t expsize,
-                     const unsigned char *real, size_t realsize,
-                     const char *caller, int line);
+    void assert_data(
+        const unsigned char *exp,
+        size_t expsize,
+        const unsigned char *real,
+        size_t realsize,
+        const char *caller,
+        int line);
 #define ASSERT_DATA(exp, expsize, real, realsize) \
     assert_data(exp, expsize, real, realsize, __FILE__, __LINE__)
 
 #define CTEST_FLT_EPSILON 1e-5
 #define CTEST_DBL_EPSILON 1e-12
 
-    void assert_compare(const char *cmp, intmax_t exp, intmax_t real, const char *caller, int line);
-#define ASSERT_EQUAL(exp, real) assert_compare("==", exp, real, __FILE__, __LINE__)
-#define ASSERT_NOT_EQUAL(exp, real) assert_compare("!=", exp, real, __FILE__, __LINE__)
+    void assert_compare(
+        const char *cmp,
+        intmax_t exp,
+        intmax_t real,
+        const char *caller,
+        int line);
+#define ASSERT_EQUAL(exp, real) \
+    assert_compare("==", exp, real, __FILE__, __LINE__)
+#define ASSERT_NOT_EQUAL(exp, real) \
+    assert_compare("!=", exp, real, __FILE__, __LINE__)
 
 #define ASSERT_LT(v1, v2) assert_compare("<", v1, v2, __FILE__, __LINE__)
 #define ASSERT_LE(v1, v2) assert_compare("<=", v1, v2, __FILE__, __LINE__)
 #define ASSERT_GT(v1, v2) assert_compare(">", v1, v2, __FILE__, __LINE__)
 #define ASSERT_GE(v1, v2) assert_compare(">=", v1, v2, __FILE__, __LINE__)
 
-    void assert_compare_u(const char *cmp, uintmax_t exp, uintmax_t real, const char *caller, int line);
-#define ASSERT_EQUAL_U(exp, real) assert_compare_u("==", exp, real, __FILE__, __LINE__)
-#define ASSERT_NOT_EQUAL_U(exp, real) assert_compare_u("!=", exp, real, __FILE__, __LINE__)
+    void assert_compare_u(
+        const char *cmp,
+        uintmax_t exp,
+        uintmax_t real,
+        const char *caller,
+        int line);
+#define ASSERT_EQUAL_U(exp, real) \
+    assert_compare_u("==", exp, real, __FILE__, __LINE__)
+#define ASSERT_NOT_EQUAL_U(exp, real) \
+    assert_compare_u("!=", exp, real, __FILE__, __LINE__)
 
-    void assert_interval(intmax_t exp1, intmax_t exp2, intmax_t real, const char *caller, int line);
-#define ASSERT_INTERVAL(exp1, exp2, real) assert_interval(exp1, exp2, real, __FILE__, __LINE__)
+    void assert_interval(
+        intmax_t exp1,
+        intmax_t exp2,
+        intmax_t real,
+        const char *caller,
+        int line);
+#define ASSERT_INTERVAL(exp1, exp2, real) \
+    assert_interval(exp1, exp2, real, __FILE__, __LINE__)
 
     void assert_null(void *real, const char *caller, int line);
 #define ASSERT_NULL(real) assert_null((void *)real, __FILE__, __LINE__)
@@ -236,16 +310,30 @@ extern "C"
     void assert_fail(const char *caller, int line);
 #define ASSERT_FAIL() assert_fail(__FILE__, __LINE__)
 
-    void assert_dbl_compare(const char *cmp, double exp, double real, double tol, const char *caller, int line);
-#define ASSERT_DBL_NEAR(exp, real) assert_dbl_compare("==", exp, real, -CTEST_DBL_EPSILON, __FILE__, __LINE__)
-#define ASSERT_DBL_NEAR_TOL(exp, real, tol) assert_dbl_compare("==", exp, real, tol, __FILE__, __LINE__)
-#define ASSERT_DBL_FAR(exp, real) assert_dbl_compare("!=", exp, real, -CTEST_DBL_EPSILON, __FILE__, __LINE__)
-#define ASSERT_DBL_FAR_TOL(exp, real, tol) assert_dbl_compare("!=", exp, real, tol, __FILE__, __LINE__)
+    void assert_dbl_compare(
+        const char *cmp,
+        double exp,
+        double real,
+        double tol,
+        const char *caller,
+        int line);
+#define ASSERT_DBL_NEAR(exp, real) \
+    assert_dbl_compare("==", exp, real, -CTEST_DBL_EPSILON, __FILE__, __LINE__)
+#define ASSERT_DBL_NEAR_TOL(exp, real, tol) \
+    assert_dbl_compare("==", exp, real, tol, __FILE__, __LINE__)
+#define ASSERT_DBL_FAR(exp, real) \
+    assert_dbl_compare("!=", exp, real, -CTEST_DBL_EPSILON, __FILE__, __LINE__)
+#define ASSERT_DBL_FAR_TOL(exp, real, tol) \
+    assert_dbl_compare("!=", exp, real, tol, __FILE__, __LINE__)
 
-#define ASSERT_FLT_NEAR(v1, v2) assert_dbl_compare("==", v1, v2, -CTEST_FLT_EPSILON, __FILE__, __LINE__)
-#define ASSERT_FLT_FAR(v1, v2) assert_dbl_compare("!=", v1, v2, -CTEST_FLT_EPSILON, __FILE__, __LINE__)
-#define ASSERT_DBL_LT(v1, v2) assert_dbl_compare("<", v1, v2, 0.0, __FILE__, __LINE__)
-#define ASSERT_DBL_GT(v1, v2) assert_dbl_compare(">", v1, v2, 0.0, __FILE__, __LINE__)
+#define ASSERT_FLT_NEAR(v1, v2) \
+    assert_dbl_compare("==", v1, v2, -CTEST_FLT_EPSILON, __FILE__, __LINE__)
+#define ASSERT_FLT_FAR(v1, v2) \
+    assert_dbl_compare("!=", v1, v2, -CTEST_FLT_EPSILON, __FILE__, __LINE__)
+#define ASSERT_DBL_LT(v1, v2) \
+    assert_dbl_compare("<", v1, v2, 0.0, __FILE__, __LINE__)
+#define ASSERT_DBL_GT(v1, v2) \
+    assert_dbl_compare(">", v1, v2, 0.0, __FILE__, __LINE__)
 
 #ifdef CTEST_MAIN
 
@@ -295,8 +383,10 @@ extern "C"
     {
     }
 
-    static void vprint_errormsg(const char *const fmt, va_list ap) CTEST_IMPL_FORMAT_PRINTF(1, 0);
-    static void print_errormsg(const char *const fmt, ...) CTEST_IMPL_FORMAT_PRINTF(1, 2);
+    static void vprint_errormsg(const char *const fmt, va_list ap)
+        CTEST_IMPL_FORMAT_PRINTF(1, 0);
+    static void print_errormsg(const char *const fmt, ...)
+        CTEST_IMPL_FORMAT_PRINTF(1, 2);
 
     static void vprint_errormsg(const char *const fmt, va_list ap)
     {
@@ -354,8 +444,6 @@ extern "C"
         msg_end();
     }
 
-    CTEST_IMPL_DIAG_PUSH_IGNORED(missing - noreturn)
-
     void CTEST_ERR(const char *fmt, ...)
     {
         va_list argp;
@@ -371,39 +459,73 @@ extern "C"
 
     CTEST_IMPL_DIAG_POP()
 
-    void assert_str(const char *cmp, const char *exp, const char *real, const char *caller, int line)
+    void assert_str(
+        const char *cmp,
+        const char *exp,
+        const char *real,
+        const char *caller,
+        int line)
     {
-        if ((!exp ^ !real) || (exp && ((cmp[1] == '=' && ((cmp[0] == '=') ^ (strcmp(exp, real) == 0))) ||
-                                       (cmp[1] == '~' && ((cmp[0] == '=') ^ (strstr(exp, real) != NULL))))))
+        if ((!exp ^ !real) || (exp && ((cmp[1] == '=' && ((cmp[0] == '=') ^ (strcmp(exp, real) == 0))) || (cmp[1] == '~' && ((cmp[0] == '=') ^ (strstr(exp, real) != NULL))))))
         {
-            CTEST_ERR("%s:%d  assertion failed, '%s' %s '%s'", caller, line, exp, cmp, real);
+            CTEST_ERR(
+                "%s:%d  assertion failed, '%s' %s '%s'",
+                caller,
+                line,
+                exp,
+                cmp,
+                real);
         }
     }
 
-    void assert_wstr(const char *cmp, const wchar_t *exp, const wchar_t *real, const char *caller, int line)
+    void assert_wstr(
+        const char *cmp,
+        const wchar_t *exp,
+        const wchar_t *real,
+        const char *caller,
+        int line)
     {
-        if ((!exp ^ !real) || (exp && ((cmp[1] == '=' && ((cmp[0] == '=') ^ (wcscmp(exp, real) == 0))) ||
-                                       (cmp[1] == '~' && ((cmp[0] == '=') ^ (wcsstr(exp, real) != NULL))))))
+        if ((!exp ^ !real) || (exp && ((cmp[1] == '=' && ((cmp[0] == '=') ^ (wcscmp(exp, real) == 0))) || (cmp[1] == '~' && ((cmp[0] == '=') ^ (wcsstr(exp, real) != NULL))))))
         {
-            CTEST_ERR("%s:%d  assertion failed, '%ls' %s '%ls'", caller, line, exp, cmp, real);
+            CTEST_ERR(
+                "%s:%d  assertion failed, '%ls' %s '%ls'",
+                caller,
+                line,
+                exp,
+                cmp,
+                real);
         }
     }
 
-    void assert_data(const unsigned char *exp, size_t expsize,
-                     const unsigned char *real, size_t realsize,
-                     const char *caller, int line)
+    void assert_data(
+        const unsigned char *exp,
+        size_t expsize,
+        const unsigned char *real,
+        size_t realsize,
+        const char *caller,
+        int line)
     {
         size_t i;
         if (expsize != realsize)
         {
-            CTEST_ERR("%s:%d  expected %" PRIuMAX " bytes, got %" PRIuMAX, caller, line, (uintmax_t)expsize, (uintmax_t)realsize);
+            CTEST_ERR(
+                "%s:%d  expected %" PRIuMAX " bytes, got %" PRIuMAX,
+                caller,
+                line,
+                (uintmax_t)expsize,
+                (uintmax_t)realsize);
         }
         for (i = 0; i < expsize; i++)
         {
             if (exp[i] != real[i])
             {
-                CTEST_ERR("%s:%d expected 0x%02x at offset %" PRIuMAX " got 0x%02x",
-                          caller, line, exp[i], (uintmax_t)i, real[i]);
+                CTEST_ERR(
+                    "%s:%d expected 0x%02x at offset %" PRIuMAX " got 0x%02x",
+                    caller,
+                    line,
+                    exp[i],
+                    (uintmax_t)i,
+                    real[i]);
             }
         }
     }
@@ -417,31 +539,64 @@ extern "C"
         return (cmp[0] == '=') == eq;
     }
 
-    void assert_compare(const char *cmp, intmax_t exp, intmax_t real, const char *caller, int line)
+    void assert_compare(
+        const char *cmp,
+        intmax_t exp,
+        intmax_t real,
+        const char *caller,
+        int line)
     {
         int c3 = (real < exp) - (exp < real);
 
         if (!get_compare_result(cmp, c3, c3 == 0))
         {
-            CTEST_ERR("%s:%d  assertion failed, %" PRIdMAX " %s %" PRIdMAX "", caller, line, exp, cmp, real);
+            CTEST_ERR(
+                "%s:%d  assertion failed, %" PRIdMAX " %s %" PRIdMAX "",
+                caller,
+                line,
+                exp,
+                cmp,
+                real);
         }
     }
 
-    void assert_compare_u(const char *cmp, uintmax_t exp, uintmax_t real, const char *caller, int line)
+    void assert_compare_u(
+        const char *cmp,
+        uintmax_t exp,
+        uintmax_t real,
+        const char *caller,
+        int line)
     {
         int c3 = (real < exp) - (exp < real);
 
         if (!get_compare_result(cmp, c3, c3 == 0))
         {
-            CTEST_ERR("%s:%d  assertion failed, %" PRIuMAX " %s %" PRIuMAX, caller, line, exp, cmp, real);
+            CTEST_ERR(
+                "%s:%d  assertion failed, %" PRIuMAX " %s %" PRIuMAX,
+                caller,
+                line,
+                exp,
+                cmp,
+                real);
         }
     }
 
-    void assert_interval(intmax_t exp1, intmax_t exp2, intmax_t real, const char *caller, int line)
+    void assert_interval(
+        intmax_t exp1,
+        intmax_t exp2,
+        intmax_t real,
+        const char *caller,
+        int line)
     {
         if (real < exp1 || real > exp2)
         {
-            CTEST_ERR("%s:%d  expected %" PRIdMAX "-%" PRIdMAX ", got %" PRIdMAX, caller, line, exp1, exp2, real);
+            CTEST_ERR(
+                "%s:%d  expected %" PRIdMAX "-%" PRIdMAX ", got %" PRIdMAX,
+                caller,
+                line,
+                exp1,
+                exp2,
+                real);
         }
     }
 
@@ -458,7 +613,13 @@ extern "C"
     }
 
     /* tol < 0 means it is an epsilon, else absolute error */
-    void assert_dbl_compare(const char *cmp, double exp, double real, double tol, const char *caller, int line)
+    void assert_dbl_compare(
+        const char *cmp,
+        double exp,
+        double real,
+        double tol,
+        const char *caller,
+        int line)
     {
         double diff = exp - real;
         double absdiff = diff < 0 ? -diff : diff;
@@ -473,7 +634,16 @@ extern "C"
                 tolstr = "eps";
                 tol = -tol;
             }
-            CTEST_ERR("%s:%d  assertion failed, %.8g %s %.8g (diff %.4g, %s %.4g)", caller, line, exp, cmp, real, diff, tolstr, tol);
+            CTEST_ERR(
+                "%s:%d  assertion failed, %.8g %s %.8g (diff %.4g, %s %.4g)",
+                caller,
+                line,
+                exp,
+                cmp,
+                real,
+                diff,
+                tolstr,
+                tol);
         }
     }
 
@@ -554,7 +724,8 @@ extern "C"
 
     int ctest_main(int argc, const char *argv[]);
 
-    __attribute__((no_sanitize_address)) int ctest_main(int argc, const char *argv[])
+    __attribute__((no_sanitize_address)) int
+    ctest_main(int argc, const char *argv[])
     {
         static int total = 0;
         static int num_ok = 0;
@@ -659,8 +830,15 @@ extern "C"
 
         const char *color = (num_fail) ? ANSI_BRED : ANSI_GREEN;
         char results[80];
-        snprintf(results, sizeof(results), "RESULTS: %d tests (%d ok, %d failed, %d skipped) ran in %.1f ms",
-                 total, num_ok, num_fail, num_skip, (double)(t2 - t1) * 1000.0 / CLOCKS_PER_SEC);
+        snprintf(
+            results,
+            sizeof(results),
+            "RESULTS: %d tests (%d ok, %d failed, %d skipped) ran in %.1f ms",
+            total,
+            num_ok,
+            num_fail,
+            num_skip,
+            (double)(t2 - t1) * 1000.0 / CLOCKS_PER_SEC);
         color_print(color, results);
         return num_fail;
     }
