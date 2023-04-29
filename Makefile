@@ -59,6 +59,7 @@ clean:
 	$(RM) obj/src/geometry/*.d
 	$(RM) obj/src/libgeometry/*.a
 	$(RM) obj/src/geometry/*.a
+	$(RM) obj/src/geometry/*.a
 	$(RM) obj/test/*.o
 	$(RM) obj/test/*.d
 	$(RM) obj/test/*.a
