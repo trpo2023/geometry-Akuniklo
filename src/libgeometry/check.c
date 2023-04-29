@@ -22,14 +22,12 @@ double pow_custom(double a)
     return a * a;
 }
 
-int check_circle_word(char *a, char *b, int *error)
+int check_circle_word(char* a, char* b, int* error)
 {
     int open_index;
 
-    for (int i = 0; i < 7; i++)
-    {
-        if (a[i] != b[i] && i < 6)
-        {
+    for (int i = 0; i < 7; i++) {
+        if (a[i] != b[i] && i < 6) {
             printf("Error at column %d: expected 'circle'\n", i);
             *error = 1;
             break;
@@ -39,69 +37,57 @@ int check_circle_word(char *a, char *b, int *error)
     return open_index;
 }
 
-int search_close_index(char *a, int *length)
+int search_close_index(char* a, int* length)
 {
     int close_index;
 
-    for (int i = 0; i < *length && a[i] != '\n'; i++)
-    {
-        if (a[i] == ')')
-        {
+    for (int i = 0; i < *length && a[i] != '\n'; i++) {
+        if (a[i] == ')') {
             close_index = i;
-        }
-        else
-        {
+        } else {
             close_index = *length - 1;
         }
     }
     return close_index;
 }
 
-int check_first_number(char *a, int *open_index, int *error)
+int check_first_number(char* a, int* open_index, int* error)
 {
     int first_index = 0;
 
-    for (int i = *open_index + 1; a[i] != ' '; i++)
-    {
-        if (*error == 0)
-        {
-            if (a[i] == ',')
-            {
+    for (int i = *open_index + 1; a[i] != ' '; i++) {
+        if (*error == 0) {
+            if (a[i] == ',') {
                 *error = 1;
                 printf("\nError at column %d: expected '<space>' and "
                        "'<double>'",
                        i);
                 break;
             }
-            if (isdigit(a[i]) == 0 && a[i] != '.' && a[i] != '-' && a[i] != ' ')
-            {
+            if (isdigit(a[i]) == 0 && a[i] != '.' && a[i] != '-'
+                && a[i] != ' ') {
                 *error = 1;
                 printf("\nError at column %d: expected '<double>'", i);
                 break;
             }
             first_index = i;
-        }
-        else
+        } else
             break;
     }
     return first_index;
 }
 
-int check_second_number(char *a, int *first_index, int *error)
+int check_second_number(char* a, int* first_index, int* error)
 {
     int second_index = 0;
-    for (int i = *first_index + 2; a[i] != ','; i++)
-    {
-        if (*error == 0)
-        {
-            if (a[i] == ')')
-            {
+    for (int i = *first_index + 2; a[i] != ','; i++) {
+        if (*error == 0) {
+            if (a[i] == ')') {
                 *error = 1;
                 printf("\nError at column %d: expected ',' and '<double>'", i);
                 break;
             }
-            if (isdigit(a[i]) == 0 && a[i] != '.' && a[i] != '-')
-            {
+            if (isdigit(a[i]) == 0 && a[i] != '.' && a[i] != '-') {
                 *error = 1;
                 printf("\nError at column %d: expected '<double>' or ',' "
                        "token",
@@ -109,25 +95,20 @@ int check_second_number(char *a, int *first_index, int *error)
                 break;
             }
             second_index = i;
-        }
-        else
+        } else
             break;
     }
     return second_index;
 }
 
-int check_third_number(char *a, int *second_index, int *close_index, int *error)
+int check_third_number(char* a, int* second_index, int* close_index, int* error)
 {
     int third_index = 0;
 
-    for (int i = *second_index + 3; i < *close_index; i++)
-    {
-        if (*error == 0)
-        {
-            if ((isdigit(a[i]) == 0 && a[i] != '.') || a[i] == '0')
-            {
-                if (a[i] == ')' || a[i] == '(' || a[i] == ' ')
-                {
+    for (int i = *second_index + 3; i < *close_index; i++) {
+        if (*error == 0) {
+            if ((isdigit(a[i]) == 0 && a[i] != '.') || a[i] == '0') {
+                if (a[i] == ')' || a[i] == '(' || a[i] == ' ') {
                     break;
                 }
                 *error = 1;
@@ -135,58 +116,46 @@ int check_third_number(char *a, int *second_index, int *close_index, int *error)
                 break;
             }
             third_index = i;
-        }
-        else
+        } else
             break;
     }
     return third_index;
 }
 
-int get_close_index(char *a, int *third_index, int *length, int *error)
+int get_close_index(char* a, int* third_index, int* length, int* error)
 {
     int close_index = 0;
 
-    for (int i = *third_index + 1; i < *length; i++)
-    {
-        if (*error == 0)
-        {
-            if (a[i] != ')')
-            {
+    for (int i = *third_index + 1; i < *length; i++) {
+        if (*error == 0) {
+            if (a[i] != ')') {
                 *error = 1;
                 printf("\nError at column %d: expected ')'", i);
                 break;
-            }
-            else
-            {
+            } else {
                 close_index = i;
                 break;
             }
-        }
-        else
+        } else
             break;
     }
     return close_index;
 }
 
-int check_unexpected_tokens(char *a, int *close_index, int *length, int *error)
+int check_unexpected_tokens(char* a, int* close_index, int* length, int* error)
 {
-    for (int i = *close_index + 1; i < *length; i++)
-    {
-        if (*error == 0)
-        {
-            if (a[i] == '\n')
-            {
+    for (int i = *close_index + 1; i < *length; i++) {
+        if (*error == 0) {
+            if (a[i] == '\n') {
                 break;
             }
 
-            if (a[i] != ' ')
-            {
+            if (a[i] != ' ') {
                 *error = 1;
                 printf("\nError at column %d: unexpected token", i);
                 break;
             }
-        }
-        else
+        } else
             break;
     }
     return *error;
@@ -205,32 +174,28 @@ void parse_circle_expression(char a[], float x[], float y[], float rad[])
     printf("square = %.3f\tperimeter = %.3f\n", square, perimeter);
 }
 
-void find_intersections(float *x, float *y, float *rad, int amount)
+void find_intersections(float* x, float* y, float* rad, int amount)
 {
     int intersections = 0;
     printf("\nIntersections:");
-    for (int i = 0; i < amount; i++)
-    {
+    for (int i = 0; i < amount; i++) {
         intersections = 0;
         printf("\ncircle %d. intersects ", i);
-        for (int j = 0; j < amount; j++)
-        {
+        for (int j = 0; j < amount; j++) {
             double r = pow_custom((x[j] - x[i])) + pow_custom((y[j] - y[i]));
             r = sqrt(r);
-            if (r == 0 && rad[i] == rad[j] && j != i)
-            {
+            if (r == 0 && rad[i] == rad[j] && j != i) {
                 intersections++;
                 printf("circle %d.\t", j);
             }
-            if (rad[i] + rad[j] >= r && rad[i] + r >= rad[j] && r + rad[j] >= rad[i] && j != i)
-            {
+            if (rad[i] + rad[j] >= r && rad[i] + r >= rad[j]
+                && r + rad[j] >= rad[i] && j != i) {
                 intersections++;
                 printf("circle %d.\t", j);
             }
         }
     }
-    if (intersections == 0)
-    {
+    if (intersections == 0) {
         printf("nothing");
     }
     puts("\n");
