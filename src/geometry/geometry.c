@@ -1,3 +1,5 @@
+#define _USE_MATH_DEFINES
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -8,24 +10,13 @@ int main()
 {
     FILE *file1;
     FILE *file;
-
     file1 = fopen("geometry.txt", "r");
-
     if (!file1)
     {
-        printf("Error: cannot open file. Check name of file\n");
+        printf("Error! Cannot open file. Check file name.\n");
         return 0;
     }
-
-    int length = 0, count = 0, element = 0, error = 0, index = 0,
-        number_of_circle = 1;
-    int ind_open_bracket = 0, ind_close_bracket = 0, ind_last_num_elm = 0,
-        ind_first_num_elm = 0, ind_second_num_elm = 0;
-
-    float *array_x = (float *)malloc(index * sizeof(float));
-    float *array_y = (float *)malloc(index * sizeof(float));
-    float *array_rad = (float *)malloc(index * sizeof(float));
-
+    int length = 0, count = 0, element = 0, error = 0;
     while (1)
     {
         element = fgetc(file1);
@@ -38,55 +29,45 @@ int main()
         }
         count++;
     }
-
     length = count;
     fclose(file1);
+    int amount = 0;
+    float *x_arr = (float *)malloc(amount * sizeof(float));
+    float *y_arr = (float *)malloc(amount * sizeof(float));
+    float *rad_arr = (float *)malloc(amount * sizeof(float));
 
-    char a[length + 1], b[6] = "circle";
+    char a[length], b[6] = "circle";
     file = fopen("geometry.txt", "r");
     while (fgets(a, length + 1, file))
     {
-        printf("%d. %s\n", number_of_circle, a);
+        int open_index = check_circle_word(a, b, &error);
 
-        // check 'circle and finding index of '(' symbol
-        ind_open_bracket = check_word(a, b, &error);
+        int close_index = search_close_index(a, &length);
 
-        // find index of ')' token
-        ind_close_bracket = find_close_bracket(a, &length);
+        int first_index = check_first_number(a, &open_index, &error);
 
-        // check first number
-        ind_first_num_elm = check_first_num(a, &ind_open_bracket, &error);
+        int second_index = check_second_number(a, &first_index, &error);
 
-        // check second number
-        ind_second_num_elm = check_second_num(a, &ind_first_num_elm, &error);
+        int third_index = check_third_number(a, &second_index, &close_index, &error);
 
-        // check last number
-        ind_last_num_elm = check_third_num(
-            a, &ind_second_num_elm, &error, &ind_close_bracket);
+        close_index = get_close_index(a, &third_index, &length, &error);
 
-        // check ')' symbol
-        ind_close_bracket = check_close_bracket(a, &ind_last_num_elm, &length, &error);
-
-        // check unexpected tokens
-        check_unexpected_token(a, &ind_close_bracket, &length, &error);
-
+        error = check_unexpected_tokens(a, &close_index, &length, &error);
         if (error == 0)
         {
-            printf("No Errors!\n");
-            float x = 0, y = 0, rad = 0;
-            token(a, &x, &y, &rad, array_x, array_y, array_rad, index);
-            index += 1;
+            puts("\n");
+            float x = 0, y = 0, radius = 0;
+            parse_circle_expression(a, &x, &y, &radius);
+            x_arr[amount] = x;
+            y_arr[amount] = y;
+            rad_arr[amount] = radius;
+            amount += 1;
         }
 
         error = 0;
-        printf("\n");
-        number_of_circle += 1;
+        puts("\n");
     }
 
-    intersects(array_x, array_y, array_rad, index);
-    free(array_x);
-    free(array_y);
-    free(array_rad);
-
+    find_intersections(x_arr, y_arr, rad_arr, amount);
     return 0;
 }
