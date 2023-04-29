@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <geometry.h>
+#include <libgeometry/geometry.h>
 
 #define MAX_SIZE 300
 #define M_PI 3.14159265358979323846
