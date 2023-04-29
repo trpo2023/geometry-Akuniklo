@@ -1,251 +1,134 @@
-#include <ctest.h>
-#include <ctype.h>
+#define _USE_MATH_DEFINES
+#include <math.h>
+#include <stdlib.h>
 #include <string.h>
 
-#include <errors.h>
-#include <geometry.h>
+#include "../src/libgeometry/check.h"
+#include "../thirdparty/ctest.h"
 
-// type id = 3 - wrong format
-// 0 - circle
-// 1 - triangle
-// 2 - polygon
-
-CTEST(partest, test_name_1)
+CTEST(check_circle_word, correct_word_test)
 {
-    char str[] = "poawlygon((3 -2.0, 3.0 2, 1.0 0, 3.0 -2, 3.0 2, 3 -2.0)) ";
-    int type_id = 0;
-    int error_num = 0;
-    long int column = 0;
-    error_num = isWKT(str, &column, &type_id);
+    char a[] = "circle(0.0, 0.0, 1.0)";
+    char b[] = "circle";
+    int error = 0;
+    int result = check_circle_word(a, b, &error);
 
-    ASSERT_EQUAL(2, error_num);
-    ASSERT_EQUAL(3, type_id);
-    ASSERT_EQUAL(0, column);
+    ASSERT_EQUAL(6, result);
+    ASSERT_EQUAL(0, error);
 }
 
-CTEST(partest, test_double_in_brackets_1)
+CTEST(search_close_index, correct_input_test)
 {
-    char str[] = "circle(10x 0, 1.5) ";
-    int type_id = 0;
-    int error_num = 0;
-    long int column = 0;
-    error_num = isWKT(str, &column, &type_id);
+    char a[] = "circle(0.0, 0.0, 1.0)";
+    int length = strlen(a);
+    int result = search_close_index(a, &length);
 
-    ASSERT_EQUAL(4, error_num);
-    ASSERT_EQUAL(0, type_id);
-    ASSERT_EQUAL(0, column);
+    ASSERT_EQUAL(20, result);
 }
 
-CTEST(partest, test_double_in_brackets_2)
+CTEST(search_close_index, no_close_bracket_test)
 {
-    char str[] = "circle(10 0, 1..5) ";
-    int type_id = 0;
-    int error_num = 0;
-    long int column = 0;
-    error_num = isWKT(str, &column, &type_id);
+    char a[] = "circle(0.0, 0.0, 1.0";
+    int length = strlen(a);
+    int result = search_close_index(a, &length);
 
-    ASSERT_EQUAL(4, error_num);
-    ASSERT_EQUAL(0, type_id);
-    ASSERT_EQUAL(0, column);
+    ASSERT_EQUAL(19, result);
 }
 
-CTEST(partest, test_left_bracket)
+CTEST(check_first_number, correct_input_test)
 {
-    char str[] = "circle(10 0, 1.5)) ";
+    char a[] = "circle(0.0, 0.0, 1.0)";
+    int open_index = 6, error = 0;
+    int result = check_first_number(a, &open_index, &error);
 
-    int type_id = 0;
-    int error_num = 0;
-    long int column = 0;
-    error_num = isWKT(str, &column, &type_id);
-
-    ASSERT_EQUAL(1, error_num);
-    ASSERT_EQUAL(0, type_id);
-    ASSERT_EQUAL(7, column);
+    ASSERT_EQUAL(9, result);
+    ASSERT_EQUAL(1, error);
 }
 
-CTEST(partest, test_right_bracket)
+CTEST(check_first_number, error_input_test)
 {
-    char str[] = "circle((10 0, 1.5) ";
-    int type_id = 0;
-    int error_num = 0;
-    long int column = 0;
-    error_num = isWKT(str, &column, &type_id);
+    char a[] = "circle(0.0x, 0.0, 1.0)";
+    int open_index = 6, error = 1;
+    int result = check_first_number(a, &open_index, &error);
 
-    ASSERT_EQUAL(5, error_num);
-    ASSERT_EQUAL(0, type_id);
-    ASSERT_EQUAL(18, column);
+    ASSERT_EQUAL(1, error);
+    ASSERT_NOT_EQUAL(11, result);
 }
 
-CTEST(partest, test_token_after_brackets)
+CTEST(check_second_number, correct_input_test)
 {
-    char str[] = "circle(10 0, 1.5) wowo ";
-    int type_id = 0;
-    int error_num = 0;
-    long int column = 0;
-    error_num = isWKT(str, &column, &type_id);
+    char a[] = "circle(0.0, 0.0, 1.0)";
+    int first_index = 11, error = 0;
+    int result = check_second_number(a, &first_index, &error);
 
-    ASSERT_EQUAL(3, error_num);
-    ASSERT_EQUAL(0, type_id);
-    ASSERT_EQUAL(17, column);
+    ASSERT_EQUAL(14, result);
+    ASSERT_EQUAL(0, error);
 }
 
-CTEST(partest, test_unneded_token)
+CTEST(check_second_number, error_input_test)
 {
-    char str[] = "circle(10 0, 1.5 1.4) ";
-    int type_id = 0;
-    int error_num = 0;
-    long int column = 0;
-    error_num = isWKT(str, &column, &type_id);
+    char a[] = "circle(0.0, 0.x, 1.0)";
+    int first_index = 11, error = 0;
+    int result = check_second_number(a, &first_index, &error);
 
-    ASSERT_EQUAL(6, error_num);
-    ASSERT_EQUAL(0, type_id);
-    ASSERT_EQUAL(0, column);
+    ASSERT_NOT_EQUAL(16, result);
+    ASSERT_EQUAL(1, error);
 }
 
-CTEST(partest, test_name_2)
+CTEST(check_third_number, correct_input_test)
 {
-    char str[] = "triangle((-3.0 -2, -1 0.0, -3.0 2.0, -3 -2)) ";
-    int type_id = 0;
-    int error_num = 0;
-    long int column = 0;
-    error_num = isWKT(str, &column, &type_id);
+    char a[] = "circle(0.0, 0.0, 1.0)";
+    int second_index = 16, error = 1, close_index = 17;
+    int result = check_third_number(a, &second_index, &close_index, &error);
 
-    ASSERT_EQUAL(0, error_num);
-    ASSERT_EQUAL(1, type_id);
-    ASSERT_EQUAL(0, column);
+    ASSERT_EQUAL(0, result);
 }
 
-CTEST(partest, test_name_3)
+CTEST(check_third_number, error_input_test)
 {
-    char str[] = "polygon((-3.0 -2, -1 0.0, -3.0 2.0, -3 -2)) ";
-    int type_id = 0;
-    int error_num = 0;
-    long int column = 0;
-    error_num = isWKT(str, &column, &type_id);
+    char a[] = "circle(0.0, 0.0, 1.x)";
+    int second_index = 16, error = 1, close_index = 17;
+    int result = check_third_number(a, &second_index, &close_index, &error);
 
-    ASSERT_EQUAL(0, error_num);
-    ASSERT_EQUAL(2, type_id);
-    ASSERT_EQUAL(0, column);
+    ASSERT_NOT_EQUAL(21, result);
+    ASSERT_EQUAL(1, error);
+}
+CTEST(get_close_index, no_error_test)
+{
+    char a[] = "circle(0.0, 0.0, 1.0)";
+    int third_index = 7, length = strlen(a), error = 0;
+    int result = get_close_index(a, &third_index, &length, &error);
+
+    ASSERT_EQUAL(0, result);
+    ASSERT_EQUAL(1, error);
 }
 
-CTEST(lextest, test_CircleExtracor_func_1)
+CTEST(get_close_index, error_test)
 {
-    Circle *circ;
-    char str[] = "circle(10 0, 1.5) ";
-    long int len = strlen(str);
-    circ = CircleExtractor(str, len);
+    char a[] = "circle(0.0, 0.0, 1.0";
+    int third_index = 7, length = strlen(a), error = 0;
+    int result = get_close_index(a, &third_index, &length, &error);
 
-    ASSERT_DBL_NEAR(10, circ->center.x);
-    ASSERT_DBL_NEAR(0, circ->center.y);
-    ASSERT_DBL_NEAR(1.5, circ->radius);
+    ASSERT_EQUAL(0, result);
+    ASSERT_EQUAL(1, error);
 }
 
-CTEST(lextest, test_CircleExtracor_func_2)
+CTEST(check_unexpected_tokens, no_error_test)
 {
-    Circle *circ;
-    char str[] = "circle(0 0, 0) ";
-    long int len = strlen(str);
-    circ = CircleExtractor(str, len);
+    char a[] = "circle(0.0, 0.0, 1.0)\n";
+    int close_index = 14, length = strlen(a), error = 0;
+    int result = check_unexpected_tokens(a, &close_index, &length, &error);
 
-    ASSERT_DBL_NEAR(0, circ->center.x);
-    ASSERT_DBL_NEAR(0, circ->center.y);
-    ASSERT_DBL_NEAR(0, circ->radius);
+    ASSERT_EQUAL(1, result);
+    ASSERT_EQUAL(1, error);
 }
 
-CTEST(lextest, test_CircleExtracor_func_3)
+CTEST(check_unexpected_tokens, error_test)
 {
-    Circle *circ;
-    char str[] = "circle(0 0, -2) ";
-    long int len = strlen(str);
-    circ = CircleExtractor(str, len);
+    char a[] = "circle(0.0, 0.0, 1.0)x";
+    int close_index = 14, length = strlen(a), error = 0;
+    int result = check_unexpected_tokens(a, &close_index, &length, &error);
 
-    ASSERT_DBL_NEAR(0, circ->center.x);
-    ASSERT_DBL_NEAR(0, circ->center.y);
-    ASSERT_DBL_NEAR(2, circ->radius);
-}
-
-CTEST(lextest, test_CircleExtracor_func_4)
-{
-    Circle *circ;
-    char str[] = "circle(32.123123 -45.126665, -2.123129) ";
-    long int len = strlen(str);
-    circ = CircleExtractor(str, len);
-    double tol = 0.00001;
-
-    ASSERT_DBL_NEAR_TOL(32.123123, circ->center.x, tol);
-    ASSERT_DBL_NEAR_TOL(-45.126665, circ->center.y, tol);
-    ASSERT_DBL_NEAR_TOL(2.123129, circ->radius, tol);
-}
-
-CTEST(lextest, test_CircleExtracor_func_5)
-{
-    Circle *circ;
-    char str[] = "circle(321231.123123 -451231.126665, -200009.123129) ";
-    long int len = strlen(str);
-    circ = CircleExtractor(str, len);
-    double tol = 0.005;
-
-    ASSERT_DBL_NEAR_TOL(321231.123123, circ->center.x, tol);
-    ASSERT_DBL_NEAR_TOL(-451231.126665, circ->center.y, tol);
-    ASSERT_DBL_NEAR_TOL(200009.123129, circ->radius, tol);
-}
-
-CTEST(calctest, test_math_1)
-{
-    Circle *circ;
-    char str[] = "circle(0 0, 10) ";
-    long int len = strlen(str);
-    circ = CircleExtractor(str, len);
-    double tol = 0.01;
-
-    circ->area = CircleAreaCalc(circ->radius);
-    circ->perimeter = CirclePerimeterCalc(circ->radius);
-
-    ASSERT_DBL_NEAR_TOL(314.16, circ->area, tol);
-    ASSERT_DBL_NEAR_TOL(62.83, circ->perimeter, tol);
-}
-
-CTEST(calctest, test_math_2)
-{
-    Circle *circ;
-    char str[] = "circle(0 0, 0) ";
-    long int len = strlen(str);
-    circ = CircleExtractor(str, len);
-    double tol = 0.01;
-
-    circ->area = CircleAreaCalc(circ->radius);
-    circ->perimeter = CirclePerimeterCalc(circ->radius);
-
-    ASSERT_DBL_NEAR_TOL(0, circ->area, tol);
-    ASSERT_DBL_NEAR_TOL(0, circ->perimeter, tol);
-}
-
-CTEST(calctest, test_math_3)
-{
-    Circle *circ;
-    char str[] = "circle(-100 -10000, -10) ";
-    long int len = strlen(str);
-    circ = CircleExtractor(str, len);
-    double tol = 0.01;
-
-    circ->area = CircleAreaCalc(circ->radius);
-    circ->perimeter = CirclePerimeterCalc(circ->radius);
-
-    ASSERT_DBL_NEAR_TOL(314.16, circ->area, tol);
-    ASSERT_DBL_NEAR_TOL(62.83, circ->perimeter, tol);
-}
-
-CTEST(calctest, test_math_4)
-{
-    Circle *circ;
-    char str[] = "circle(-100 -10000, 0) ";
-    long int len = strlen(str);
-    circ = CircleExtractor(str, len);
-    double tol = 0.01;
-
-    circ->area = CircleAreaCalc(circ->radius);
-    circ->perimeter = CirclePerimeterCalc(circ->radius);
-
-    ASSERT_DBL_NEAR_TOL(0, circ->area, tol);
-    ASSERT_DBL_NEAR_TOL(0, circ->perimeter, tol);
+    ASSERT_EQUAL(1, result);
+    ASSERT_EQUAL(1, error);
 }
