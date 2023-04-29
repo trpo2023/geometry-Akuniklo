@@ -33,7 +33,7 @@ all: $(APP_PATH)
 -include $(DEPS)
 
 $(APP_PATH): $(APP_OBJECTS) $(LIB_PATH)
-	$(CC) $(CFLAGS) $(CPPFLAGS) $^ -o $@ -lm
+	$(CC) $(CFLAGS) $(CPPFLAGS) $^ -o $@
 
 $(LIB_PATH): $(LIB_OBJECTS)
 	ar rcs $@ $^
@@ -41,22 +41,25 @@ $(LIB_PATH): $(LIB_OBJECTS)
 $(OBJ_DIR)/%.o: %.c
 	$(CC) -c $(CFLAGS) $(CPPFLAGS) $< -o $@
 
-.PHONY: run 
+.PHONY: run clean test
 
 run:
 	./bin/geometry
 
-.PHONY: clear
-
-clear:
-	$(RM) $(APP_PATH) $(OBJ_DIR)/*/*/*.[aod]
-	$(RM) $(BIN_DIR)/*.[exed]
-	$(RM) obj/test/*.[aod]
-
-.PHONY: test
-
 test: $(TEST_PATH)
 
 $(TEST_PATH): $(TEST_OBJECTS) $(LIB_PATH)
-	$(CC) $(CFLAGS) $(CPPFLAGS) $^ -o $@ -lm
+	$(CC) $(CFLAGS) $(CPPFLAGS) $^ -o $@
 	./bin/test
+
+clean:
+	$(RM) obj/src/libgeometry/*.o
+	$(RM) obj/src/geometry/*.o
+	$(RM) obj/src/libgeometry/*.d
+	$(RM) obj/src/geometry/*.d
+	$(RM) obj/src/libgeometry/*.a
+	$(RM) obj/src/geometry/*.a
+	$(RM) obj/test/*.o
+	$(RM) obj/test/*.d
+	$(RM) obj/test/*.a
+	$(RM) bin/*.exe

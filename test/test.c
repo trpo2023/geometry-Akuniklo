@@ -1,210 +1,134 @@
-#include <stdio.h>
+#define _USE_MATH_DEFINES
+#include <math.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "../src/libgeometry/check.h"
 #include "../thirdparty/ctest.h"
 
-CTEST(input_check, check_word_1)
+CTEST(check_circle_word, correct_word_test)
 {
-    char *a = "circle(1.2 2, 1.4)";
-    char *b = "circle";
+    char a[] = "circle(0.0, 0.0, 1.0)";
+    char b[] = "circle";
     int error = 0;
+    int result = check_circle_word(a, b, &error);
 
-    int expected = 0;
-    check_word(a, b, &error);
-    int real = error;
-
-    ASSERT_EQUAL(expected, real);
+    ASSERT_EQUAL(6, result);
+    ASSERT_EQUAL(0, error);
 }
 
-CTEST(input_check, check_word_2)
+CTEST(search_close_index, correct_input_test)
 {
-    char *a = "ciccle(1.2 2, 1.4)";
-    char *b = "circle";
-    int error = 0;
+    char a[] = "circle(0.0, 0.0, 1.0)";
+    int length = strlen(a);
+    int result = search_close_index(a, &length);
 
-    int expected = 1;
-    check_word(a, b, &error);
-    int real = error;
-
-    ASSERT_EQUAL(expected, real);
+    ASSERT_EQUAL(20, result);
 }
 
-CTEST(input_check, check_open_bracket_1)
+CTEST(search_close_index, no_close_bracket_test)
 {
-    char *a = "circle(1.2 2, 1.4)";
-    char *b = "circle";
-    int error = 0;
+    char a[] = "circle(0.0, 0.0, 1.0";
+    int length = strlen(a);
+    int result = search_close_index(a, &length);
 
-    int expected = 6;
-    int real = check_word(a, b, &error);
-
-    ASSERT_EQUAL(expected, real);
+    ASSERT_EQUAL(19, result);
 }
 
-CTEST(input_check, check_open_bracket_2)
+CTEST(check_first_number, correct_input_test)
 {
-    char *a = "circle1.2 2, 1.4)";
-    char *b = "circle";
+    char a[] = "circle(0.0, 0.0, 1.0)";
+    int open_index = 6, error = 0;
+    int result = check_first_number(a, &open_index, &error);
 
-    int error = 0;
-
-    int expected = 1;
-    check_word(a, b, &error);
-    int real = error;
-
-    ASSERT_EQUAL(expected, real);
+    ASSERT_EQUAL(9, result);
+    ASSERT_EQUAL(1, error);
 }
 
-CTEST(input_check, find_close_bracket_1)
+CTEST(check_first_number, error_input_test)
 {
-    char *a = "circle(1.2 2, 1.4)";
-    int len = strlen(a);
+    char a[] = "circle(0.0x, 0.0, 1.0)";
+    int open_index = 6, error = 1;
+    int result = check_first_number(a, &open_index, &error);
 
-    int expected = 17;
-    int real = find_close_bracket(a, &len);
-
-    ASSERT_EQUAL(expected, real);
+    ASSERT_EQUAL(1, error);
+    ASSERT_NOT_EQUAL(11, result);
 }
 
-CTEST(input_check, find_close_bracket_2)
+CTEST(check_second_number, correct_input_test)
 {
-    char *a = "circle(1.2 2, 1.4";
-    int len = strlen(a);
+    char a[] = "circle(0.0, 0.0, 1.0)";
+    int first_index = 11, error = 0;
+    int result = check_second_number(a, &first_index, &error);
 
-    int expected = 0;
-    int real = find_close_bracket(a, &len);
-
-    ASSERT_EQUAL(expected, real);
+    ASSERT_EQUAL(14, result);
+    ASSERT_EQUAL(0, error);
 }
 
-CTEST(input_check, first_number_1)
+CTEST(check_second_number, error_input_test)
 {
-    char *a = "circle(1.2 2, 1.4)";
-    int ind_open_bracket = 6;
-    int error = 0;
+    char a[] = "circle(0.0, 0.x, 1.0)";
+    int first_index = 11, error = 0;
+    int result = check_second_number(a, &first_index, &error);
 
-    int expected = 9;
-    int real = check_first_num(a, &ind_open_bracket, &error);
-
-    ASSERT_EQUAL(expected, real);
+    ASSERT_NOT_EQUAL(16, result);
+    ASSERT_EQUAL(1, error);
 }
 
-CTEST(input_check, first_number_2)
+CTEST(check_third_number, correct_input_test)
 {
-    char *a = "circle(a 2, 1.4)";
-    int error = 0;
-    int ind_open_bracket = 6;
+    char a[] = "circle(0.0, 0.0, 1.0)";
+    int second_index = 16, error = 1, close_index = 17;
+    int result = check_third_number(a, &second_index, &close_index, &error);
 
-    int expected = 1;
-    check_first_num(a, &ind_open_bracket, &error);
-    int real = error;
-
-    ASSERT_EQUAL(expected, real);
+    ASSERT_EQUAL(0, result);
 }
 
-CTEST(input_check, second_number_1)
+CTEST(check_third_number, error_input_test)
 {
-    char *a = "circle(1.2 2, 1.4)";
-    int error = 0;
-    int ind_first_number = 9;
+    char a[] = "circle(0.0, 0.0, 1.x)";
+    int second_index = 16, error = 1, close_index = 17;
+    int result = check_third_number(a, &second_index, &close_index, &error);
 
-    int expected = 11;
-    int real = check_second_num(a, &ind_first_number, &error);
+    ASSERT_NOT_EQUAL(21, result);
+    ASSERT_EQUAL(1, error);
+}
+CTEST(get_close_index, no_error_test)
+{
+    char a[] = "circle(0.0, 0.0, 1.0)";
+    int third_index = 7, length = strlen(a), error = 0;
+    int result = get_close_index(a, &third_index, &length, &error);
 
-    ASSERT_EQUAL(expected, real);
+    ASSERT_EQUAL(0, result);
+    ASSERT_EQUAL(1, error);
 }
 
-CTEST(input_check, second_number_2)
+CTEST(get_close_index, error_test)
 {
-    char *a = "circle(1.2 a, 1.4)";
-    int error = 0;
-    int ind_first_number = 9;
+    char a[] = "circle(0.0, 0.0, 1.0";
+    int third_index = 7, length = strlen(a), error = 0;
+    int result = get_close_index(a, &third_index, &length, &error);
 
-    int expected = 1;
-    check_second_num(a, &ind_first_number, &error);
-    int real = error;
-
-    ASSERT_EQUAL(expected, real);
+    ASSERT_EQUAL(0, result);
+    ASSERT_EQUAL(1, error);
 }
 
-CTEST(input_check, third_number_1)
+CTEST(check_unexpected_tokens, no_error_test)
 {
-    char *a = "circle(1.2 2, 1.4)";
-    int ind_second_number = 11;
-    int ind_close_bracket = 17;
-    int error = 0;
+    char a[] = "circle(0.0, 0.0, 1.0)\n";
+    int close_index = 14, length = strlen(a), error = 0;
+    int result = check_unexpected_tokens(a, &close_index, &length, &error);
 
-    int expected = 16;
-    int real = check_third_num(
-        a, &ind_second_number, &error, &ind_close_bracket);
-
-    ASSERT_EQUAL(expected, real);
+    ASSERT_EQUAL(1, result);
+    ASSERT_EQUAL(1, error);
 }
 
-CTEST(input_check, third_number_2)
+CTEST(check_unexpected_tokens, error_test)
 {
-    char *a = "circle(1.2 2, x)";
-    int ind_second_number = 11;
-    int ind_close_bracket = 15;
-    int error = 0;
+    char a[] = "circle(0.0, 0.0, 1.0)x";
+    int close_index = 14, length = strlen(a), error = 0;
+    int result = check_unexpected_tokens(a, &close_index, &length, &error);
 
-    int expected = 1;
-    check_third_num(a, &ind_second_number, &error, &ind_close_bracket);
-    int real = error;
-
-    ASSERT_EQUAL(expected, real);
-}
-
-CTEST(input_check, check_close_bracket_1)
-{
-    char *a = "circle(1.2 2, 1.4)";
-    int ind_third_number = 16;
-    int len = strlen(a);
-    int error = 0;
-
-    int expected = 17;
-    int real = check_close_bracket(a, &ind_third_number, &len, &error);
-
-    ASSERT_EQUAL(expected, real);
-}
-
-CTEST(input_check, check_close_bracket_2)
-{
-    char *a = "circle(1.2 2, 1.4a";
-    int ind_third_number = 16;
-    int len = strlen(a);
-    int error = 0;
-
-    int expected = 1;
-    check_close_bracket(a, &ind_third_number, &len, &error);
-    int real = error;
-
-    ASSERT_EQUAL(expected, real);
-}
-
-CTEST(input_check, check_unexpected_token_1)
-{
-    char *a = "circle(1.2 2, 1.4)";
-    int ind_close_bracket = 17;
-    int len = strlen(a);
-    int error = 0;
-
-    int expected = 0;
-    int real = check_unexpected_token(a, &ind_close_bracket, &len, &error);
-
-    ASSERT_EQUAL(expected, real);
-}
-
-CTEST(input_check, check_unexpected_token_2)
-{
-    char *a = "circle(1.2 2, 1.4) a";
-    int ind_close_bracket = 17;
-    int len = strlen(a);
-    int error = 0;
-
-    int expected = 1;
-    int real = check_unexpected_token(a, &ind_close_bracket, &len, &error);
-
-    ASSERT_EQUAL(expected, real);
+    ASSERT_EQUAL(1, result);
+    ASSERT_EQUAL(1, error);
 }
