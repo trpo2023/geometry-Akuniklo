@@ -4,3 +4,7 @@
 *.o
 *.d
 *.a
+*.Identifier
+*.vscode
+test
+geometry
