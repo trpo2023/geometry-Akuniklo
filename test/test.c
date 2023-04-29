@@ -6,8 +6,8 @@
 
 CTEST(input_check, check_word_1)
 {
-    char* a = "circle(1.2 2, 1.4)";
-    char* b = "circle";
+    char *a = "circle(1.2 2, 1.4)";
+    char *b = "circle";
     int error = 0;
 
     int expected = 0;
@@ -19,8 +19,8 @@ CTEST(input_check, check_word_1)
 
 CTEST(input_check, check_word_2)
 {
-    char* a = "ciccle(1.2 2, 1.4)";
-    char* b = "circle";
+    char *a = "ciccle(1.2 2, 1.4)";
+    char *b = "circle";
     int error = 0;
 
     int expected = 1;
@@ -32,8 +32,8 @@ CTEST(input_check, check_word_2)
 
 CTEST(input_check, check_open_bracket_1)
 {
-    char* a = "circle(1.2 2, 1.4)";
-    char* b = "circle";
+    char *a = "circle(1.2 2, 1.4)";
+    char *b = "circle";
     int error = 0;
 
     int expected = 6;
@@ -44,8 +44,8 @@ CTEST(input_check, check_open_bracket_1)
 
 CTEST(input_check, check_open_bracket_2)
 {
-    char* a = "circle1.2 2, 1.4)";
-    char* b = "circle";
+    char *a = "circle1.2 2, 1.4)";
+    char *b = "circle";
 
     int error = 0;
 
@@ -58,7 +58,7 @@ CTEST(input_check, check_open_bracket_2)
 
 CTEST(input_check, find_close_bracket_1)
 {
-    char* a = "circle(1.2 2, 1.4)";
+    char *a = "circle(1.2 2, 1.4)";
     int len = strlen(a);
 
     int expected = 17;
@@ -69,7 +69,7 @@ CTEST(input_check, find_close_bracket_1)
 
 CTEST(input_check, find_close_bracket_2)
 {
-    char* a = "circle(1.2 2, 1.4";
+    char *a = "circle(1.2 2, 1.4";
     int len = strlen(a);
 
     int expected = 0;
@@ -80,7 +80,7 @@ CTEST(input_check, find_close_bracket_2)
 
 CTEST(input_check, first_number_1)
 {
-    char* a = "circle(1.2 2, 1.4)";
+    char *a = "circle(1.2 2, 1.4)";
     int ind_open_bracket = 6;
     int error = 0;
 
@@ -92,7 +92,7 @@ CTEST(input_check, first_number_1)
 
 CTEST(input_check, first_number_2)
 {
-    char* a = "circle(a 2, 1.4)";
+    char *a = "circle(a 2, 1.4)";
     int error = 0;
     int ind_open_bracket = 6;
 
@@ -105,7 +105,7 @@ CTEST(input_check, first_number_2)
 
 CTEST(input_check, second_number_1)
 {
-    char* a = "circle(1.2 2, 1.4)";
+    char *a = "circle(1.2 2, 1.4)";
     int error = 0;
     int ind_first_number = 9;
 
@@ -117,7 +117,7 @@ CTEST(input_check, second_number_1)
 
 CTEST(input_check, second_number_2)
 {
-    char* a = "circle(1.2 a, 1.4)";
+    char *a = "circle(1.2 a, 1.4)";
     int error = 0;
     int ind_first_number = 9;
 
@@ -130,21 +130,21 @@ CTEST(input_check, second_number_2)
 
 CTEST(input_check, third_number_1)
 {
-    char* a = "circle(1.2 2, 1.4)";
+    char *a = "circle(1.2 2, 1.4)";
     int ind_second_number = 11;
     int ind_close_bracket = 17;
     int error = 0;
 
     int expected = 16;
     int real = check_third_num(
-            a, &ind_second_number, &error, &ind_close_bracket);
+        a, &ind_second_number, &error, &ind_close_bracket);
 
     ASSERT_EQUAL(expected, real);
 }
 
 CTEST(input_check, third_number_2)
 {
-    char* a = "circle(1.2 2, x)";
+    char *a = "circle(1.2 2, x)";
     int ind_second_number = 11;
     int ind_close_bracket = 15;
     int error = 0;
@@ -158,7 +158,7 @@ CTEST(input_check, third_number_2)
 
 CTEST(input_check, check_close_bracket_1)
 {
-    char* a = "circle(1.2 2, 1.4)";
+    char *a = "circle(1.2 2, 1.4)";
     int ind_third_number = 16;
     int len = strlen(a);
     int error = 0;
@@ -171,7 +171,7 @@ CTEST(input_check, check_close_bracket_1)
 
 CTEST(input_check, check_close_bracket_2)
 {
-    char* a = "circle(1.2 2, 1.4a";
+    char *a = "circle(1.2 2, 1.4a";
     int ind_third_number = 16;
     int len = strlen(a);
     int error = 0;
@@ -185,7 +185,7 @@ CTEST(input_check, check_close_bracket_2)
 
 CTEST(input_check, check_unexpected_token_1)
 {
-    char* a = "circle(1.2 2, 1.4)";
+    char *a = "circle(1.2 2, 1.4)";
     int ind_close_bracket = 17;
     int len = strlen(a);
     int error = 0;
@@ -198,7 +198,7 @@ CTEST(input_check, check_unexpected_token_1)
 
 CTEST(input_check, check_unexpected_token_2)
 {
-    char* a = "circle(1.2 2, 1.4) a";
+    char *a = "circle(1.2 2, 1.4) a";
     int ind_close_bracket = 17;
     int len = strlen(a);
     int error = 0;
