@@ -59,39 +59,24 @@ int main()
     {
         printf("%s", a);
 
-        // check 'circle and finding index of '(' symbol
         check_word(a, b, &error, &ind_open_bracket);
 
-        // printf("error = %d\tind_open_bracket = %d\n", error,
-        // ind_open_bracket);
-
-        // find index of ')' token
         find_close_bracket(a, &length, &ind_close_bracket);
-        // printf("ind_close_bracket = %d\n", ind_close_bracket);
 
-        // check first number
         check_first_num(a, &ind_open_bracket, &ind_first_num_elm, &error);
-        // printf("ind_first_num_elm = %d\n", ind_first_num_elm);
 
-        // check second number
         check_second_num(a, &ind_first_num_elm, &ind_second_num_elm, &error);
-        // printf("ind_second_num_elm = %d\n", ind_second_num_elm);
 
-        // check last number
         check_third_num(
             a,
             &ind_second_num_elm,
             &ind_last_num_elm,
             &error,
             &ind_close_bracket);
-        // printf("ind_last_num_elm = %d\n", ind_last_num_elm);
 
-        // check ')' symbol
         check_close_bracket(
             a, &ind_last_num_elm, &length, &ind_close_bracket, &error);
-        // printf("ind_close_bracket = %d\n", ind_close_bracket);
 
-        // check unexpected tokens
         check_unexpected_token(a, &ind_close_bracket, &length, &error);
 
         if (error == 0)
