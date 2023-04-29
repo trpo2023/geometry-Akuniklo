@@ -61,4 +61,4 @@ clean:
 .PHONY: run
 
 run:
-	/bin/geometry
+	./bin/geometry
