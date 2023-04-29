@@ -1,8 +1,2 @@
-circle(0 0 ,1.5w)
-circle((0 0, 1.5)
-circle(0 0 , 1.5) 123
-circle(0 0,1.5)
-circle(0 0,1.5 23 21)
-circle(x10 0, 1.5)
-circle(1 -12.32 , 1.5)
-circle(-12.131 332.4, 2.5  )
+circle(1 2, 3)
+circle(1.2 3.45, 123)
