@@ -7,7 +7,6 @@
 #include <libgeometry/geometry.h>
 #include <libgeometry/errors.h>
 
-#define MAX_SIZE 300
 #define M_PI 3.14159265358979323846
 
 Circle *CircleExtractor(char *str, long int len)
